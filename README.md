@@ -46,4 +46,4 @@ Navegação: Navigation Compose
 
 [ ] Sistema de Avaliação de Pontos: Permitir que outros utilizadores confirmem ou contestem a validade de um ponto (por exemplo, "este buraco já foi tapado").
 
-Link do APK [Clique aqui]([https://github.com](https://drive.google.com/file/d/1YMzHWXtYmzMiiYgvsplIRUxLwS01bbXo/view?usp=drive_link)).
+Link do APK [Clique aqui](https://drive.google.com/file/d/1YMzHWXtYmzMiiYgvsplIRUxLwS01bbXo/view?usp=drive_link).
