@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "287148696156",
+    "project_id": "ciclomap-1c40c",
+    "storage_bucket": "ciclomap-1c40c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287148696156:android:28e68d0cefa1740c8ebc99",
+        "android_client_info": {
+          "package_name": "com.gustavo.ciclomap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDShGpggF10suOLdDZp8_Me0rciQBAzCAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
