@@ -10,12 +10,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,10 +27,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,6 +54,7 @@ import com.google.firebase.ktx.Firebase
 import com.gustavo.ciclomap.model.Ponto
 import com.gustavo.ciclomap.ui.theme.CicloMapTheme
 import com.gustavo.ciclomap.utils.vectorToBitmap
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -64,9 +65,11 @@ val tiposDePontoMap = mapOf(
     "oficina" to "Oficina/Bicicletaria"
 )
 
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
+sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
+    object Splash : Screen("splash", "Splash")
     object Map : Screen("map", "Mapa", Icons.Default.Map)
     object Profile : Screen("profile", "Perfil", Icons.Default.Person)
+    object Main : Screen("main", "Main") // Rota para o grupo de ecrãs principais
 }
 
 class MainActivity : ComponentActivity() {
@@ -74,11 +77,51 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CicloMapTheme {
-                MainScreen()
+                RootNavigation()
             }
         }
     }
 }
+
+@Composable
+fun RootNavigation() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = Screen.Splash.route) {
+        composable(Screen.Splash.route) {
+            SplashScreen(navController = navController)
+        }
+        composable(Screen.Main.route) {
+            MainScreen()
+        }
+    }
+}
+
+@Composable
+fun SplashScreen(navController: NavController) {
+    LaunchedEffect(key1 = true) {
+        delay(2500L) // Aguarda 2.5 segundos
+        navController.navigate(Screen.Main.route) {
+            popUpTo(Screen.Splash.route) {
+                inclusive = true
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Image(
+            painter = painterResource(id = R.drawable.ciclomap_logo),
+            contentDescription = "Logo do CicloMap",
+            modifier = Modifier.size(150.dp)
+        )
+    }
+}
+
 
 @Composable
 fun MainScreen() {
@@ -86,7 +129,6 @@ fun MainScreen() {
     val contexto = LocalContext.current
     val TAG = "MainScreen"
 
-    // O estado agora é gerido aqui, no topo da hierarquia
     var pontos by remember { mutableStateOf<List<Ponto>>(emptyList()) }
     var pontosCollectionRef by remember { mutableStateOf<CollectionReference?>(null) }
     val currentUserId by remember { derivedStateOf { Firebase.auth.currentUser?.uid } }
@@ -141,20 +183,22 @@ fun BottomNavigationBar(navController: NavController) {
         val currentRoute = navBackStackEntry?.destination?.route
 
         items.forEach { screen ->
-            NavigationBarItem(
-                icon = { Icon(screen.icon, contentDescription = screen.title) },
-                label = { Text(screen.title) },
-                selected = currentRoute == screen.route,
-                onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+            screen.icon?.let {
+                NavigationBarItem(
+                    icon = { Icon(it, contentDescription = screen.title) },
+                    label = { Text(screen.title) },
+                    selected = currentRoute == screen.route,
+                    onClick = {
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
@@ -391,7 +435,7 @@ fun MapScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Arraste o ponto para o local exato e confirme",
+                        text = "Arraste o pino para o local exato e confirme",
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
